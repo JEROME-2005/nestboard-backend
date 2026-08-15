@@ -20,6 +20,7 @@ model User {
   favorites     Favorite[]
   properties    Property[]     @relation("VendorProperties")
   refreshTokens RefreshToken[]
+  reviews Review[]
 
   @@map("users")
 }
@@ -56,6 +57,7 @@ model Property {
   favoritedBy Favorite[]
   vendor      User         @relation("VendorProperties", fields: [vendorId], references: [id], onDelete: Cascade)
   roomTypes   RoomType[]
+  reviews Review[]
 
   @@index([city])
   @@index([type])
@@ -106,6 +108,7 @@ model Booking {
   createdAt      DateTime      @default(now()) @map("created_at")
   room           Room          @relation(fields: [roomId], references: [id])
   tenant         User          @relation(fields: [tenantId], references: [id])
+  review Review?
 
   @@index([roomId, seatNumber, bookingStatus, leaseStart, leaseEnd])
   @@index([tenantId, createdAt(sort: Desc)])
@@ -122,6 +125,25 @@ model Favorite {
   @@id([userId, propertyId])
   @@index([propertyId])
   @@map("favorites")
+}
+
+model Review {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  propertyId String   @map("property_id") @db.Uuid
+  bookingId  String   @unique @map("booking_id") @db.Uuid
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  booking  Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([propertyId, createdAt(sort: Desc)])
+  @@map("reviews")
 }
 
 enum Role {

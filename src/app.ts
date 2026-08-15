@@ -12,6 +12,7 @@ import { bookingsRouter } from "./routes/bookings.js";
 import { uploadsRouter } from "./routes/uploads.js";
 import path from "node:path";
 import rateLimit from "express-rate-limit";
+import { reviewsRouter } from "./routes/reviews.js";
 
 export function buildApp(): Express {
   const app = express();
@@ -38,6 +39,7 @@ export function buildApp(): Express {
   app.use("/api/properties", propertiesRouter);
   app.use("/api/auth", authRouter);
   app.use("/api/bookings/", bookingsRouter);
+  app.use("/api", reviewsRouter);
   app.use("/api/uploads", uploadsRouter);
   app.use("/uploads", express.static(path.resolve(env.UPLOAD_LOCAL_DIR)));
 
