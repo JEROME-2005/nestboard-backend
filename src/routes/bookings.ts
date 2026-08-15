@@ -36,3 +36,9 @@ bookingsRouter.post(
 );
 
 bookingsRouter.get("/my", requireRole(Role.USER), ctrl.myBookings);
+
+bookingsRouter.get(
+  "/admin",
+  requireRole(Role.ADMIN),
+  ctrl.adminBookings,
+);
