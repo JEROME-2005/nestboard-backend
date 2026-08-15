@@ -18,10 +18,10 @@ model User {
   passwordHash  String?        @map("password_hash")
   bookings      Booking[]
   favorites     Favorite[]
+  notifications Notification[]
   properties    Property[]     @relation("VendorProperties")
   refreshTokens RefreshToken[]
-  reviews Review[]
-  notifications Notification[]
+  reviews       Review[]
 
   @@map("users")
 }
@@ -40,26 +40,26 @@ model RefreshToken {
 }
 
 model Property {
-  id          String       @id @default(uuid()) @db.Uuid
-  vendorId    String       @map("vendor_id") @db.Uuid
-  title       String
-  description String
-  address     String
-  city        String
-  type        PropertyType
-  rating      Decimal      @default(0) @db.Decimal(3, 2)
-  amenities   String[]     @default([])
-  latitude    Float
-  longitude   Float
-  imageUrl    String       @map("image_url")
-  minStay     String       @default("1 month") @map("min_stay")
-  isActive    Boolean      @default(true) @map("is_active")
-  createdAt   DateTime     @default(now()) @map("created_at")
-  favoritedBy Favorite[]
-  vendor      User         @relation("VendorProperties", fields: [vendorId], references: [id], onDelete: Cascade)
-  roomTypes   RoomType[]
-  reviews Review[]
+  id            String         @id @default(uuid()) @db.Uuid
+  vendorId      String         @map("vendor_id") @db.Uuid
+  title         String
+  description   String
+  address       String
+  city          String
+  type          PropertyType
+  rating        Decimal        @default(0) @db.Decimal(3, 2)
+  amenities     String[]       @default([])
+  latitude      Float
+  longitude     Float
+  imageUrl      String         @map("image_url")
+  minStay       String         @default("1 month") @map("min_stay")
+  isActive      Boolean        @default(true) @map("is_active")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  favoritedBy   Favorite[]
   notifications Notification[]
+  vendor        User           @relation("VendorProperties", fields: [vendorId], references: [id], onDelete: Cascade)
+  reviews       Review[]
+  roomTypes     RoomType[]
 
   @@index([city])
   @@index([type])
@@ -97,21 +97,21 @@ model Room {
 }
 
 model Booking {
-  id             String        @id @default(uuid()) @db.Uuid
-  tenantId       String        @map("tenant_id") @db.Uuid
-  roomId         String        @map("room_id") @db.Uuid
-  seatNumber     Int           @map("seat_number")
-  leaseStart     DateTime      @map("lease_start") @db.Date
-  leaseEnd       DateTime      @map("lease_end") @db.Date
-  durationMonths Int           @map("duration_months")
-  totalAmount    Decimal       @map("total_amount") @db.Decimal(10, 2)
-  paymentStatus  PaymentStatus @default(PENDING) @map("payment_status")
-  bookingStatus  BookingStatus @default(PENDING) @map("booking_status")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  room           Room          @relation(fields: [roomId], references: [id])
-  tenant         User          @relation(fields: [tenantId], references: [id])
-  review Review?
-  notifications Notification[]
+  id             String         @id @default(uuid()) @db.Uuid
+  tenantId       String         @map("tenant_id") @db.Uuid
+  roomId         String         @map("room_id") @db.Uuid
+  seatNumber     Int            @map("seat_number")
+  leaseStart     DateTime       @map("lease_start") @db.Date
+  leaseEnd       DateTime       @map("lease_end") @db.Date
+  durationMonths Int            @map("duration_months")
+  totalAmount    Decimal        @map("total_amount") @db.Decimal(10, 2)
+  paymentStatus  PaymentStatus  @default(PENDING) @map("payment_status")
+  bookingStatus  BookingStatus  @default(PENDING) @map("booking_status")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  room           Room           @relation(fields: [roomId], references: [id])
+  tenant         User           @relation(fields: [tenantId], references: [id])
+  notifications  Notification[]
+  review         Review?
 
   @@index([roomId, seatNumber, bookingStatus, leaseStart, leaseEnd])
   @@index([tenantId, createdAt(sort: Desc)])
@@ -139,10 +139,9 @@ model Review {
   comment    String?
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  booking  Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, propertyId])
   @@index([propertyId, createdAt(sort: Desc)])
@@ -150,19 +149,17 @@ model Review {
 }
 
 model Notification {
-  id         String   @id @default(uuid()) @db.Uuid
-  userId     String   @map("user_id") @db.Uuid
-  bookingId  String?  @map("booking_id") @db.Uuid
-  propertyId String?  @map("property_id") @db.Uuid
-
+  id         String           @id @default(uuid()) @db.Uuid
+  userId     String           @map("user_id") @db.Uuid
+  bookingId  String?          @map("booking_id") @db.Uuid
+  propertyId String?          @map("property_id") @db.Uuid
   type       NotificationType
   message    String
-  isRead     Boolean  @default(false) @map("is_read")
-  createdAt  DateTime @default(now()) @map("created_at")
-
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  booking  Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  property Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  isRead     Boolean          @default(false) @map("is_read")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  booking    Booking?         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  property   Property?        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead, createdAt(sort: Desc)])
   @@index([bookingId])
