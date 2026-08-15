@@ -1,0 +1,30 @@
+node_modules/
+dist/
+scratch/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+
+# Locally-uploaded files (runtime artifacts from the L12 upload endpoint)
+uploads/
+
+# Editor
+.vscode/
+
+# Compiled TS output — we commit the .ts sources, not build artifacts.
+# (src/generated is intentionally committed; see below.)
+prisma.config.js
+prisma.config.d.ts
+prisma.config.js.map
+prisma.config.d.ts.map
+prisma/seed.js
+prisma/seed.d.ts
+prisma/seed.js.map
+prisma/seed.d.ts.map
+
+/src/generated/prisma
+
+# Google OAuth credential downloads — never commit
+client_secret_*.json
