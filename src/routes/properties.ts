@@ -37,6 +37,9 @@ import {
   requireOwnedRoom,
   requireOwnedRoomType,
 } from "../services/property-ownership.js";
+import {
+  availabilityQuerySchema,
+} from "../schemas/availability.js";
 
 export const propertiesRouter: Router = Router();
 
@@ -81,26 +84,25 @@ function getPagination(query: Record<string, unknown>) {
 function availabilityWindow(
   query: Record<string, unknown>,
 ) {
-  const startMonth = query.startMonth;
+  const parsed =
+    availabilityQuerySchema.parse(query);
 
-  if (
-    typeof startMonth === "string" &&
-    /^\d{4}-\d{2}$/.test(startMonth)
-  ) {
-    const duration = parsePositiveInt(
-      query.durationMonths,
-      1,
-    );
+  if (!parsed.startMonth) {
+    const now = new Date();
 
-    return leaseRange(startMonth, duration);
+    return {
+      start: now,
+      end: now,
+    };
   }
 
-  const now = new Date();
+  const duration =
+    parsed.durationMonths ?? 1;
 
-  return {
-    start: now,
-    end: now,
-  };
+  return leaseRange(
+    parsed.startMonth,
+    duration,
+  );
 }
 
 async function bookedSeatsByRoom(

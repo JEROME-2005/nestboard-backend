@@ -67,3 +67,49 @@ uploadsRouter.post(
     }
   },
 );
+
+uploadsRouter.post(
+  "/profile-image",
+  verifyJwt,
+  upload.single("image"),
+  async (req, res, next) => {
+    try {
+      if (!req.file) {
+        throw Errors.validation(
+          "Missing image field",
+        );
+      }
+
+      if (useR2) {
+        const ext = path
+          .extname(
+            req.file.originalname,
+          )
+          .toLowerCase();
+
+        const key =
+          `profile-images/${req.user!.id}/${randomUUID()}${ext}`;
+
+        const url =
+          await uploadToR2(
+            key,
+            req.file.buffer,
+            req.file.mimetype,
+          );
+
+        res.status(201).json({
+          url,
+        });
+
+        return;
+      }
+
+      res.status(201).json({
+        url:
+          `/uploads/${req.file.filename}`,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
