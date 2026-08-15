@@ -44,3 +44,12 @@ export const PropertyType = {
 } as const
 
 export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType]
+
+
+export const NotificationType = {
+  BOOKING_CONFIRMED: 'BOOKING_CONFIRMED',
+  BOOKING_CANCELLED: 'BOOKING_CANCELLED',
+  BOOKING_EXPIRED: 'BOOKING_EXPIRED'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

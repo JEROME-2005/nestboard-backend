@@ -53,3 +53,18 @@ export const adminBookings: RequestHandler = async (
     next(err);
   }
 };
+
+export const cancel: RequestHandler =
+  async (req, res, next) => {
+    try {
+      const booking =
+        await svc.cancelBooking(
+          String(req.params.id),
+          req.user!.id,
+        );
+
+      res.json(booking);
+    } catch (err) {
+      next(err);
+    }
+  };

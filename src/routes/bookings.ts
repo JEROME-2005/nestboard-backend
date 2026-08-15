@@ -35,6 +35,13 @@ bookingsRouter.post(
   ctrl.confirm,
 );
 
+bookingsRouter.post(
+  "/:id/cancel",
+  requireRole(Role.USER),
+  validateParams(idParam),
+  ctrl.cancel,
+);
+
 bookingsRouter.get("/my", requireRole(Role.USER), ctrl.myBookings);
 
 bookingsRouter.get(

@@ -21,6 +21,7 @@ model User {
   properties    Property[]     @relation("VendorProperties")
   refreshTokens RefreshToken[]
   reviews Review[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -58,6 +59,7 @@ model Property {
   vendor      User         @relation("VendorProperties", fields: [vendorId], references: [id], onDelete: Cascade)
   roomTypes   RoomType[]
   reviews Review[]
+  notifications Notification[]
 
   @@index([city])
   @@index([type])
@@ -109,6 +111,7 @@ model Booking {
   room           Room          @relation(fields: [roomId], references: [id])
   tenant         User          @relation(fields: [tenantId], references: [id])
   review Review?
+  notifications Notification[]
 
   @@index([roomId, seatNumber, bookingStatus, leaseStart, leaseEnd])
   @@index([tenantId, createdAt(sort: Desc)])
@@ -146,6 +149,27 @@ model Review {
   @@map("reviews")
 }
 
+model Notification {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  bookingId  String?  @map("booking_id") @db.Uuid
+  propertyId String?  @map("property_id") @db.Uuid
+
+  type       NotificationType
+  message    String
+  isRead     Boolean  @default(false) @map("is_read")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking  Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt(sort: Desc)])
+  @@index([bookingId])
+  @@index([propertyId])
+  @@map("notifications")
+}
+
 enum Role {
   ADMIN
   USER
@@ -169,4 +193,10 @@ enum PropertyType {
   VILLA
   APARTMENT
   HOTEL
+}
+
+enum NotificationType {
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  BOOKING_EXPIRED
 }
