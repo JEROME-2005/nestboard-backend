@@ -948,11 +948,14 @@ propertiesRouter.get(
           },
         });
 
-      if (!property) {
-        throw Errors.notFound(
-          "Property",
-        );
-      }
+      if (
+  !property ||
+  !property.isActive
+) {
+  throw Errors.notFound(
+    "Property",
+  );
+}
 
       const roomIds =
         property.roomTypes.flatMap(
