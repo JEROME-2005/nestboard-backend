@@ -376,6 +376,67 @@ function propertyFilters(
   return where;
 }
 
+type PropertySort = "recency" | "price_asc" | "price_desc" | "rating_desc"
+
+function propertyOrderBy(
+  query: Record<string, unknown>,
+): Prisma.PropertyOrderByWithRelationInput[] {
+  const sort =
+    typeof query.sort === "string"
+      ? query.sort
+      : "recency"
+
+  switch (sort as PropertySort) {
+    case "price_asc":
+      return [
+        {
+          roomTypes: {
+            _count: "asc",
+          },
+        },
+        {
+          createdAt: "desc",
+        },
+      ]
+
+    case "price_desc":
+      return [
+        {
+          roomTypes: {
+            _count: "desc",
+          },
+        },
+        {
+          createdAt: "desc",
+        },
+      ]
+
+    case "rating_desc":
+      return [
+        {
+          rating: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+        {
+          id: "desc",
+        },
+      ]
+
+    case "recency":
+    default:
+      return [
+        {
+          createdAt: "desc",
+        },
+        {
+          id: "desc",
+        },
+      ]
+  }
+}
+
 /* ============================================================
    PUBLIC PROPERTY LIST
 ============================================================ */
@@ -485,14 +546,7 @@ propertiesRouter.get(
             vendorId,
           },
 
-          orderBy: [
-            {
-              createdAt: "desc",
-            },
-            {
-              id: "desc",
-            },
-          ],
+          orderBy: propertyOrderBy(req.query),
 
           include: {
             roomTypes: true,
