@@ -5,9 +5,15 @@ import { prisma } from "./lib/prisma.js";
 
 const app = buildApp();
 
-const server = app.listen(env.PORT, () => {
-  console.log(`Server running on http://localhost:${env.PORT}`);
-});
+const server = app.listen(
+  env.PORT,
+  '0.0.0.0',
+  () => {
+    console.log(
+      `Server running on port ${env.PORT}`,
+    );
+  },
+);
 
 async function shutdown(signal: string) {
   logger.info({ signal }, "Shutting down gracefully");
