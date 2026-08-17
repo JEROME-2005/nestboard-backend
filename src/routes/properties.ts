@@ -534,10 +534,10 @@ propertiesRouter.get(
   requireRole(Role.ADMIN),
   async (req, res, next) => {
     try {
-      const vendorId = req.user?.id;
+      const vendorId = req.user?.id
 
       if (!vendorId) {
-        throw Errors.unauthenticated();
+        throw Errors.unauthenticated()
       }
 
       const properties =
@@ -546,23 +546,32 @@ propertiesRouter.get(
             vendorId,
           },
 
-          orderBy: propertyOrderBy(req.query),
+          orderBy: {
+            createdAt: "desc",
+          },
 
           include: {
-            roomTypes: true,
+            roomTypes: {
+              include: {
+                rooms: true,
+              },
+            },
           },
-        });
+        })
 
-      res.json(
-        properties.map((property) =>
-          toPropertyDTO(property),
-        ),
-      );
+      // IMPORTANT:
+      // Do NOT use toPropertyDTO() here.
+      //
+      // AdminDashboard needs the complete property object:
+      // address, city, amenities, latitude, longitude,
+      // imageUrl, minStay, isActive and roomTypes.
+
+      res.json(properties)
     } catch (err) {
-      next(err);
+      next(err)
     }
   },
-);
+)
 
 /* ============================================================
    CITIES
