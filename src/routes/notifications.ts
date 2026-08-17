@@ -1,9 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
-import { Role } from "../generated/enums.js";
 import {
   verifyJwt,
-  requireRole,
 } from "../middleware/auth.js";
 import {
   validateParams,
@@ -13,10 +11,7 @@ import * as ctrl from "../controllers/notification-controller.js";
 export const notificationsRouter =
   Router();
 
-notificationsRouter.use(
-  verifyJwt,
-  requireRole(Role.USER),
-);
+notificationsRouter.use(verifyJwt);
 
 const idParam = z.object({
   id: z.uuid(),

@@ -7,60 +7,144 @@ const propertyTypeSchema = z.enum([
   "HOTEL",
 ]);
 
+const imageUrlSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(2048)
+  .refine(
+    (value) =>
+      /^https?:\/\//i.test(value) ||
+      value.startsWith("/uploads/"),
+    {
+      message:
+        "Image URL must be an http(s) URL or a local /uploads/ path",
+    },
+  );
+
 const propertyFields = {
   title: z.string().trim().min(3).max(120),
 
-  // Prisma uses @db.Text, so 120 characters was unnecessarily restrictive.
-  description: z.string().trim().min(3).max(5000),
+  description: z
+    .string()
+    .trim()
+    .min(3)
+    .max(5000),
 
-  address: z.string().trim().min(3).max(255),
+  address: z
+    .string()
+    .trim()
+    .min(3)
+    .max(255),
 
-  city: z.string().trim().min(2).max(120),
+  city: z
+    .string()
+    .trim()
+    .min(2)
+    .max(120),
 
   type: propertyTypeSchema,
 
-  // Keep this for compatibility with the existing model.
-  // Later, B4 Reviews will make rating server-derived.
-  rating: z.number().min(0).max(5).optional(),
+  rating: z
+    .number()
+    .min(0)
+    .max(5)
+    .optional(),
 
   amenities: z
-    .array(z.string().trim().min(1).max(100))
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1)
+        .max(100),
+    )
     .max(50)
     .default([]),
 
-  latitude: z.number().finite().min(-90).max(90),
+  latitude: z
+    .number()
+    .finite()
+    .min(-90)
+    .max(90),
 
-  longitude: z.number().finite().min(-180).max(180),
+  longitude: z
+    .number()
+    .finite()
+    .min(-180)
+    .max(180),
 
-  imageUrl: z.string().url(),
+  imageUrl: imageUrlSchema,
 
-  minStay: z.string().trim().min(1).max(50).default("1 month"),
+  minStay: z
+    .string()
+    .trim()
+    .min(1)
+    .max(50)
+    .default("1 month"),
 
-  isActive: z.boolean().optional(),
+  isActive: z
+    .boolean()
+    .optional(),
 };
 
-export const createPropertySchema = z
-  .object(propertyFields)
-  .strict();
+export const createPropertySchema =
+  z
+    .object(propertyFields)
+    .strict();
 
-export const updatePropertySchema = z
-  .object({
-    title: propertyFields.title.optional(),
-    description: propertyFields.description.optional(),
-    address: propertyFields.address.optional(),
-    city: propertyFields.city.optional(),
-    type: propertyFields.type.optional(),
-    amenities: propertyFields.amenities.optional(),
-    latitude: propertyFields.latitude.optional(),
-    longitude: propertyFields.longitude.optional(),
-    imageUrl: propertyFields.imageUrl.optional(),
-    minStay: propertyFields.minStay.optional(),
-    isActive: propertyFields.isActive,
-  })
-  .strict()
-  .refine((data) => Object.keys(data).length > 0, {
-    message: "At least one field must be provided",
-  });
+export const updatePropertySchema =
+  z
+    .object({
+      title:
+        propertyFields.title.optional(),
 
-export type CreatePropertyInput = z.infer<typeof createPropertySchema>;
-export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>;
+      description:
+        propertyFields.description.optional(),
+
+      address:
+        propertyFields.address.optional(),
+
+      city:
+        propertyFields.city.optional(),
+
+      type:
+        propertyFields.type.optional(),
+
+      amenities:
+        propertyFields.amenities.optional(),
+
+      latitude:
+        propertyFields.latitude.optional(),
+
+      longitude:
+        propertyFields.longitude.optional(),
+
+      imageUrl:
+        propertyFields.imageUrl.optional(),
+
+      minStay:
+        propertyFields.minStay.optional(),
+
+      isActive:
+        propertyFields.isActive,
+    })
+    .strict()
+    .refine(
+      (data) =>
+        Object.keys(data).length > 0,
+      {
+        message:
+          "At least one field must be provided",
+      },
+    );
+
+export type CreatePropertyInput =
+  z.infer<
+    typeof createPropertySchema
+  >;
+
+export type UpdatePropertyInput =
+  z.infer<
+    typeof updatePropertySchema
+  >;

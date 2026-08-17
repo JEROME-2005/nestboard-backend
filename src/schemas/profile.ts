@@ -11,8 +11,25 @@ export const updateProfileSchema = z
 
     avatarUrl: z
       .string()
-      .url()
+      .trim()
+      .min(1)
       .max(2048)
+      .refine(
+        (value) =>
+          /^https?:\/\//i.test(value) ||
+          value.startsWith("/uploads/"),
+        {
+          message:
+            "Avatar URL must be an http(s) URL or a local /uploads/ path",
+        },
+      )
+      .nullable()
+      .optional(),
+
+    bioTag: z
+      .string()
+      .trim()
+      .max(255)
       .nullable()
       .optional(),
   })
